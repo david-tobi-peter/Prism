@@ -49,8 +49,6 @@ func HandleForward(downStreamServer string) echo.HandlerFunc {
 			proxyReq.Header.Set("X-Forwarded-For", clientIP)
 		}
 
-		proxyReq.Header.Set("Test-Header", "Test")
-
 		resp, err := http.DefaultClient.Do(proxyReq)
 		if err != nil {
 			log.Printf("Backend connection faiure: %v", err)

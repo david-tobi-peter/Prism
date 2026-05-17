@@ -37,5 +37,11 @@ func ValidateMessageBodyLength(req *http.Request) error {
 		}
 	}
 
+	for key := range req.Header {
+		if strings.ContainsAny(key, " \t\r\n:") {
+			return errors.New("Invalid Header Field Name")
+		}
+	}
+
 	return nil
 }
