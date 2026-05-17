@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/david-tobi-peter/Prism/internal/validators"
 	"github.com/labstack/echo/v5"
 )
 
@@ -13,6 +14,10 @@ func HandleForward(downStreamServer string) echo.HandlerFunc {
 	return func(c *echo.Context) error {
 		req := c.Request()
 		res := c.Response()
+
+		if err := validators.ValidateMessageBodyLength(req); err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
 
 		backendURL := downStreamServer + req.URL.Path
 
