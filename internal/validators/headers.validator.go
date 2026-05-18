@@ -45,3 +45,29 @@ func ValidateMessageBodyLength(req *http.Request) error {
 
 	return nil
 }
+
+func StripHopByHopHeaders(req *http.Request) {
+	var standardHopHeaders = []string{
+		"Connection",
+		"Keep-Alive",
+		"Proxy-Authenticate",
+		"Proxy-Authorization",
+		"Te",
+		"Trailer",
+		"Transfer-Encoding",
+		"Upgrade",
+	}
+
+	if connectionHeader := req.Header.Get("Connection"); connectionHeader != "" {
+		for token := range strings.SplitSeq(connectionHeader, ",") {
+			trimmedToken := strings.TrimSpace(token)
+			if trimmedToken != "" {
+				req.Header.Del(trimmedToken)
+			}
+		}
+	}
+
+	for _, hopHeader := range standardHopHeaders {
+		req.Header.Del(hopHeader)
+	}
+}

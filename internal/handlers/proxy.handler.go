@@ -19,6 +19,8 @@ func HandleForward(downStreamServer string) echo.HandlerFunc {
 			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 		}
 
+		validators.StripHopByHopHeaders(req)
+
 		backendURL := downStreamServer + req.URL.Path
 
 		if req.URL.RawQuery != "" {
