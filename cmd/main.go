@@ -17,9 +17,9 @@ func main() {
 
 	e.Use(middlewares.RequestTracer())
 
-	downStreamServer := "http://localhost:8081"
+	proxyEngine := handlers.NewProxyEngine("http://localhost:8081")
 
-	e.Any("/*", handlers.HandleForward(downStreamServer))
+	e.Any("/*", proxyEngine.HandleForward())
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
