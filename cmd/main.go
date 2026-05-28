@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -44,7 +45,7 @@ func main() {
 	defer cancel()
 
 	sc := echo.StartConfig{
-		Address:         ":8080",
+		Address:         fmt.Sprintf(":%d", cfg.Port),
 		GracefulTimeout: 5 * time.Second,
 	}
 

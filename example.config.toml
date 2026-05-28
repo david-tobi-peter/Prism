@@ -1,0 +1,16 @@
+port = 8080
+
+[[routes]]
+path = "/activities"
+backend = "http://localhost:8001"
+strip_prefix = true
+
+[[routes]]
+path = "/games"
+backend = "http://localhost:8006"
+strip_prefix = true
+
+[[routes]]
+path = "/users"
+backend = "http://localhost:8014"
+strip_prefix = true
