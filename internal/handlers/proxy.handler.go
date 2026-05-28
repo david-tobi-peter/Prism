@@ -12,14 +12,14 @@ import (
 )
 
 type ProxyEngine struct {
-	Client           *http.Client
-	DownStreamServer string
+	Client *http.Client
+	Router *proxy.Router
 }
 
-func NewProxyEngine(downStreamServer string) *ProxyEngine {
+func NewProxyEngine(router *proxy.Router) *ProxyEngine {
 	return &ProxyEngine{
-		Client:           proxy.PooledClient(),
-		DownStreamServer: downStreamServer,
+		Client: proxy.PooledClient(),
+		Router: router,
 	}
 }
 
@@ -34,13 +34,18 @@ func (pe *ProxyEngine) HandleForward() echo.HandlerFunc {
 
 		validators.StripHopByHopHeaders(req)
 
-		backendURL := pe.DownStreamServer + req.URL.Path
+		backend, rewrittenPath, found := pe.Router.Resolve(req.URL.Path)
 
-		if req.URL.RawQuery != "" {
-			backendURL += "?" + req.URL.RawQuery
+		if !found {
+			return echo.NewHTTPError(http.StatusNotFound, "No route found for "+req.URL.Path)
 		}
 
-		proxyReq, err := http.NewRequestWithContext(req.Context(), req.Method, backendURL, req.Body)
+		targetURL := backend + rewrittenPath
+		if req.URL.RawQuery != "" {
+			targetURL += "?" + req.URL.RawQuery
+		}
+
+		proxyReq, err := http.NewRequestWithContext(req.Context(), req.Method, targetURL, req.Body)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, "Internal Proxy Error")
 		}
